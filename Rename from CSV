@@ -1,0 +1,35 @@
+#target bridge
+ if( BridgeTalk.appName == "bridge" ) {
+fileNameToProduct = MenuElement.create("command", "Rename from CSV", "at the end of Thumbnail");
+}
+fileNameToProduct.onSelect = function () {
+   renameToProduct();
+   }
+function renameToProduct(){
+var Path =app.document.presentationPath;
+var descFile = File.openDialog("Open Product File","CSV File(*.csv):*.csv;");
+if(descFile == null) return;
+descFile.open('r');
+var datFile=[];
+while(!descFile.eof){
+var line = descFile.readln();
+if(line.length > 5) datFile.push(line);
+ }
+descFile.close();
+for(var t in datFile){
+var str=datFile[t];
+str= str.split(',');
+var fileName = File(Path+"/"+ str.shift());
+var product = str.shift();
+if(!fileName.exists) continue;
+var ext = fileName.toString().toLowerCase().match(/[^\.]+$/);
+var thumb  = new Thumbnail(fileName);
+var md = thumb.synchronousMetadata;
+md.namespace = "http://ns.adobe.com/xap/1.0/mm/";
+md.PreservedFileName = thumb.name;
+$.sleep(100); //give it time to update the metadata  
+var newName = product + "." +ext;
+fileName.rename(newName);  
+    }
+alert("Check it.");
+}
